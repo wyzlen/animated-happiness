@@ -1,26 +1,19 @@
-# Use official PHP with Apache
+# Pin to a specific PHP version (8.3 is current stable as of late 2025)
 FROM php:8.3-apache
 
-# Install any needed extensions (add more as required)
-# Common ones: pdo_mysql, gd, zip, intl, opcache, etc.
-RUN docker-php-ext-install pdo_mysql mysqli
-
-# Enable Apache mod_rewrite (useful for pretty URLs)
+# Enable rewrite module (common need)
 RUN a2enmod rewrite
 
-# Set recommended PHP.ini settings for production (optional but good)
-RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+# Install common extensions (add more if your index.php needs them, e.g., pdo_mysql)
+RUN docker-php-ext-install pdo_mysql mysqli gd
 
-# Set working directory
-WORKDIR /var/www/html
+# Copy your files (adjust if your files are in a subfolder)
+COPY . /var/www/html/
 
-# Copy project files
-COPY . .
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && a2ensite 000-default.conf \
+    && a2dissite default-ssl.conf  # Disable SSL if not needed
 
-# Ensure proper permissions (optional, for production)
-RUN chown -R www-data:www-data /var/www/html
-
-# Expose port 80
+# Expose port 80 (required for docs)
 EXPOSE 80
-
-# Apache runs in foreground by default
