@@ -24,8 +24,9 @@ app.use(express.static(__dirname));
 
 // 3. Make every other URL show your main website
 app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/index.php');
+  res.sendFile(__dirname + '/index.html');
 });
 
 
 app.listen(process.env.PORT || 3000);
+
